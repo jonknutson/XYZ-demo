@@ -29,7 +29,7 @@ func getHostAddress() string {
 	if !isSet {
 		appPort = "8080"
 	}
-	return fmt.Sprintf("localhost:%s", appPort)
+	return fmt.Sprintf("0.0.0.0:%s", appPort)
 }
 
 func main() {
