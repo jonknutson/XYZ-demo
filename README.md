@@ -17,5 +17,12 @@ by using the GIN_MODE ENV variable:
 - using env:	export GIN_MODE=release
 
 ## API Definition
-GET /motd - returns a JSON formatted message containing the
+GET / - returns a JSON formatted message containing the
 timestamp and static message.
+
+# Infrastructure as Code
+All IaC is managed in the terraform directory.
+
+# Pipeline Information
+ci.yaml builds the application.
+terraform.yaml deploys infrastructure.

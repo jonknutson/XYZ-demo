@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -34,7 +35,9 @@ func getHostAddress() string {
 func main() {
 
 	router := gin.Default()
-	router.GET("/motd", getMOTD)
+	router.GET("/", getMOTD)
 
-	router.Run(getHostAddress())
+	if err := router.Run(getHostAddress()); err != nil {
+		log.Fatal(err)
+	}
 }
