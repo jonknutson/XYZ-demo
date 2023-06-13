@@ -37,11 +37,11 @@ jobs:
       - name: get necessary packages
         run: go get .
 
-      - name: Test
-        run: go test -v ./...
-
       - name: Build
         run: go build -o build/api-demo -v ./...
+
+      - name: Test
+        run: go test -v ./...
 
       - name: Upload artifact
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
