@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = var.TF_STATE_BUCKET
+    bucket = "xyz-demo20230613003940639700000001"
     key    = "repo/github/jonknutson/XYZ-demo"
     region = "us-east-2"
   }
