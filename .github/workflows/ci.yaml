@@ -1,0 +1,53 @@
+# This workflow will build and test a golang project
+# on push to any branches and on PRs to main. It will
+# archive the build artifact on merge to main for use
+# in other workflows.
+
+name: Go
+
+on:
+  push:
+    paths:
+      - 'app/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - "main"
+    paths:
+      - 'app/**'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./app
+    env:
+      GOPATH: /home/runner/work/tmp/go
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: get necessary packages
+        run: go get .
+
+      - name: Build
+        run: CGO_ENABLED=0 GOOS=linux go build -o build/api-demo -v ./...
+
+      - name: Test
+        run: go test -v ./...
+
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-demo-x
+          path: '**/build/api-demo'
+
+

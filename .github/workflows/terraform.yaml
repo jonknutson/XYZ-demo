@@ -1,0 +1,62 @@
+name: Terraform
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - 'terraform/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - "main"
+    paths:
+      - 'terraform/**'
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./terraform
+    env:
+      AWS_DEFAULT_REGION: us-east-2
+      AWS_ROLE_SESSION_NAME:  ${{ github.event.repository.name }}-terraform
+      TF_IN_AUTOMATION: true
+      TF_VAR_TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+
+      - name: Setup
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Format
+        run: terraform fmt -check
+
+      - name: Init
+        run: terraform init
+
+      - name: Validate
+        run: terraform validate -no-color
+
+      - name: Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan
+
+      - name: Apply
+        if: github.event_name == 'push'
+        run: terraform apply -auto-approve
