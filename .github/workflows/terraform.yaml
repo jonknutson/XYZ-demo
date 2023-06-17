@@ -27,7 +27,7 @@ jobs:
       AWS_DEFAULT_REGION: us-east-2
       AWS_ROLE_SESSION_NAME:  ${{ github.event.repository.name }}-terraform
       TF_IN_AUTOMATION: true
-      TF_VAR_TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+      TF_VAR_PIPELINE_ROLE: ${{ secrets.AWS_ROLE_ARN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
