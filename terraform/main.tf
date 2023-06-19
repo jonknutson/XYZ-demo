@@ -14,18 +14,22 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-2"
+  region = local.region
   default_tags {
-    tags = {
-      Project   = "xyzdemo"
-      Terraform = "true"
-      Repo      = "github.com/jonknutson/XYZ-demo"
-    }
+    tags = local.tags
   }
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 locals {
   project_name = "xyzdemo"
-  aws_region   = "us-east-2"
-  aws_zone     = "us-east-2a"
+  region       = "us-east-2"
+  tags = {
+    Project   = "xyzdemo"
+    Terraform = "true"
+    Repo      = "github.com/jonknutson/XYZ-demo"
+  }
 }

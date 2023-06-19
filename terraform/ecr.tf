@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "xyz_demo" {
-  name                 = "xyz-demo"
+  name                 = local.project_name
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
