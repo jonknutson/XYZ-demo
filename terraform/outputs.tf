@@ -10,8 +10,8 @@ output "ecr_repo" {
 
 output "eks_cluster" {
   value = {
-    cluster_name = module.eks-cluster.cluster_name
-    cluster_endpoint = module.eks-cluster.cluster_endpoint
+    cluster_name         = module.eks-cluster.cluster_name
+    cluster_endpoint     = module.eks-cluster.cluster_endpoint
     cluster_oidc_provier = module.eks-cluster.oidc_provider_arn
   }
 }
