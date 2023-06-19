@@ -12,9 +12,7 @@ module "eks-cluster" {
     kube-proxy = {}
     vpc-cni    = {}
     coredns = {
-      configuration_values = jsonencode({
-        computeType = "Fargate"
-      })
+      most_recent = true
     }
   }
 
@@ -22,49 +20,42 @@ module "eks-cluster" {
   subnet_ids               = module.vpc.private_subnets
   control_plane_subnet_ids = module.vpc.intra_subnets
 
-  # Fargate profiles use the cluster primary security group
-  create_cluster_security_group = false
-  create_node_security_group    = false
+  # EKS managed node group
+  eks_managed_node_group_defaults = {
+    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+  }
 
-  fargate_profile_defaults = {
-    iam_role_additional_polices = {
-      additional = aws_iam_policy.additional.arn
+  eks_managed_node_groups = {
+    blue = {
+      create = false
+    }
+    green = {
+      min_size     = 1
+      max_size     = 3
+      desired_size = 1
+
+      instance_types = ["t3.large", "m5.large", "c4.large", "c5.large"]
+      capacity_type  = "SPOT"
     }
   }
-  fargate_profiles = merge(
-    {
-      default = {
-        name = "default"
-        selectors = [
-          { namespace = "default" },
-          { namespace = "xyzdemo" }
-        ]
-        subnet_ids = [module.vpc.private_subnets[1]]
 
-        tags = { Owner = "secondary" }
-
-        timeouts = {
-          create = "20m"
-          delete = "20m"
-        }
-      }
-    },
-    { for i in range(3) :
-      "kube-system-${element(split("-", local.azs[i]), 2)}" => {
-        selectors = [
-          { namespace = "kube-system" }
-        ]
-        subnet_ids = [module.vpc.private_subnets[i]]
-      }
-    }
-  )
+  # aws-auth configmap
+  #manage_aws_auth_configmap = true
 
   aws_auth_roles = [
     {
       rolearn  = var.PIPELINE_ROLE
       username = "github"
       groups   = ["system:masters"]
-    }
+    },
+  ]
+
+  aws_auth_users = [
+    {
+      userarn  = var.K8S_USER_ARN
+      username = "jon"
+      groups   = ["system:masters"]
+    },
   ]
 
   tags = local.tags
