@@ -1,12 +1,6 @@
-name: Apply Kubernetes Manifests
+name: Shutdown K8s Services
 
 on:
-  push:
-    branches:
-      - "main"
-    paths:
-      - 'k8s-config/**'
-      - '.github/workflows/k8s-config.yaml'
   workflow_dispatch:
 
 permissions:
@@ -14,8 +8,8 @@ permissions:
   contents: read # This is required for actions/checkout
 
 jobs:
-  deploy:
-    name: Apply manifests
+  container:
+    name: Shutdown K8s Services
     runs-on: ubuntu-22.04
     defaults:
       run:
@@ -34,11 +28,11 @@ jobs:
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
 
-      - name: Apply Kubernetes Manifests
+      - name: kubectl delete
         id: kubectl
         env:
           REGION: us-east-2
           CLUSTER: xyzdemo
         uses: jonknutson/kubectl-eks-apply@v2.1.3
         with:
-          kubectl-command: apply -f ./k8s-config
+          kubectl-command: delete -f ./k8s-config

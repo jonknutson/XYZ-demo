@@ -72,3 +72,7 @@ NLB.
 ```
 curl my-load-balancer-9475cc03f9cc58c0.elb.us-east-2.amazonaws.com
 ```
+
+## Clean-up
+* Delete K8s resources: From GitHub Actions, select `Shutdown K8s Services`, and run it against main.
+* Delete AWS resources: From GitHub Actions, select `Remove Infrastructure`, and run it against main.

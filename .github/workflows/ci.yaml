@@ -3,7 +3,7 @@
 # archive the build artifact on merge to main for use
 # in other workflows.
 
-name: Go
+name: Go Build
 
 on:
   push:

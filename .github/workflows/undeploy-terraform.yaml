@@ -1,12 +1,6 @@
-name: Apply Kubernetes Manifests
+name: Remove Infrastructure
 
 on:
-  push:
-    branches:
-      - "main"
-    paths:
-      - 'k8s-config/**'
-      - '.github/workflows/k8s-config.yaml'
   workflow_dispatch:
 
 permissions:
@@ -14,15 +8,18 @@ permissions:
   contents: read # This is required for actions/checkout
 
 jobs:
-  deploy:
-    name: Apply manifests
+  terraform:
+    name: Terraform
     runs-on: ubuntu-22.04
     defaults:
       run:
-        working-directory: ./k8s-config
+        working-directory: ./terraform
     env:
       AWS_DEFAULT_REGION: us-east-2
-      AWS_ROLE_SESSION_NAME: ${{ github.event.repository.name }}-k8s
+      AWS_ROLE_SESSION_NAME:  ${{ github.event.repository.name }}-terraform
+      TF_IN_AUTOMATION: true
+      TF_VAR_K8S_USER_ARN: ${{ secrets.K8S_USER_ARN }}
+      TF_VAR_PIPELINE_ROLE: ${{ secrets.AWS_ROLE_ARN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -34,11 +31,10 @@ jobs:
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
 
-      - name: Apply Kubernetes Manifests
-        id: kubectl
-        env:
-          REGION: us-east-2
-          CLUSTER: xyzdemo
-        uses: jonknutson/kubectl-eks-apply@v2.1.3
+      - name: Setup
+        uses: hashicorp/setup-terraform@v2
         with:
-          kubectl-command: apply -f ./k8s-config
+          terraform_version: 1.5.0
+
+      - name: Destroy
+        run: terraform destroy -auto-approve
