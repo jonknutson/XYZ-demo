@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xyz-demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: xyz-demo
+  template:
+    metadata:
+      name: xyz-demo-app
+      labels:
+        app: xyz-demo
+    spec:
+      containers:
+        - name: xyz-demo-app
+          image: jonknutson/xyz-demo:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: "256Mi"
+            requests:
+              cpu: 100m
+              memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xyz-demo-service
+  labels:
+    app: xyz-demo
+spec:
+  selector:
+    app: xyz-demo
+  ports:
+    - port: 8080

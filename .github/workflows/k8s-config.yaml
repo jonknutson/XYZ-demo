@@ -1,0 +1,44 @@
+name: Apply Kubernetes Manifests
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - 'k8s-config/**'
+      - '.github/workflows/k8s-config.yaml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  container:
+    name: Apply manifests
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./k8s-config
+    env:
+      AWS_DEFAULT_REGION: us-east-2
+      AWS_ROLE_SESSION_NAME: ${{ github.event.repository.name }}-k8s
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+
+      - name: Apply Kubernetes Manifests
+        id: kubectl
+        env:
+          REGION: us-east-2
+          CLUSTER: xyzdemo
+        uses: jonknutson/kubectl-eks-apply@v2.1.2
+        with:
+          kubectl-command: apply -f ./k8s-config
