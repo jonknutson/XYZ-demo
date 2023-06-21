@@ -9,10 +9,6 @@ on:
       - 'Dockerfile'
   workflow_dispatch:
 
-permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
-
 jobs:
   container:
     name: Build container
@@ -27,7 +23,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build, tag, and push image to ECR and Docker Hub
+      - name: Build, tag, and push image to Docker Hub
         if: ( github.ref == 'refs/heads/main' && github.event_name == 'push' ) || github.event_name == 'workflow_dispatch'
         env:
           DOCKER_REGISTRY: jonknutson
