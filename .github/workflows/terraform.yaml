@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       manualApply:
-        description: 'Peformm TF Apply?'
+        description: 'Perform TF Apply?'
         required: true
         default: false
         type: boolean
@@ -64,9 +64,9 @@ jobs:
         run: terraform validate -no-color
 
       - name: Plan
-        if: github.event_name == ( 'pull_request' || 'workflow_dispatch' )
+        if: ( github.event_name == 'pull_request' ) || ( github.event_name == 'workflow_dispatch' )
         run: terraform plan
 
       - name: Apply
-        if: ( github.event_name == 'push' ) || $MANUAL_TRIGGER_APPLY
+        if: ( github.event_name == 'push' ) || inputs.manualApply
         run: terraform apply -auto-approve
