@@ -13,6 +13,12 @@ on:
     paths:
       - 'terraform/**'
   workflow_dispatch:
+    inputs:
+      manualApply:
+        description: 'Peformm TF Apply?'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -28,6 +34,7 @@ jobs:
     env:
       AWS_DEFAULT_REGION: us-east-2
       AWS_ROLE_SESSION_NAME:  ${{ github.event.repository.name }}-terraform
+      MANUAL_TRIGGER_APPLY:  ${{ inputs.manualApply }}
       TF_IN_AUTOMATION: true
       TF_VAR_K8S_USER_ARN: ${{ secrets.K8S_USER_ARN }}
       TF_VAR_PIPELINE_ROLE: ${{ secrets.AWS_ROLE_ARN }}
@@ -57,9 +64,9 @@ jobs:
         run: terraform validate -no-color
 
       - name: Plan
-        if: github.event_name == 'pull_request'
+        if: github.event_name == ( 'pull_request' || 'workflow_dispatch' )
         run: terraform plan
 
       - name: Apply
-        if: github.event_name == 'push'
+        if: ( github.event_name == 'push' ) || $MANUAL_TRIGGER_APPLY
         run: terraform apply -auto-approve
