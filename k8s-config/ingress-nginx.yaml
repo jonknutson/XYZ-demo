@@ -18,3 +18,15 @@ spec:
                 name: xyz-demo-service
                 port:
                   number: 8080
+          - path: /apple
+            pathType: Prefix
+            backend:
+              service:
+                name: apple-service
+                port: 5678
+          - path: /banana
+            pathType: Prefix
+            backend:
+              service:
+                name: banana-service
+                port: 5678
