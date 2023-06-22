@@ -23,10 +23,12 @@ spec:
             backend:
               service:
                 name: apple-service
-                port: 5678
+                port:
+                  number: 5678
           - path: /banana
             pathType: Prefix
             backend:
               service:
                 name: banana-service
-                port: 5678
+                port:
+                  number: 5678
