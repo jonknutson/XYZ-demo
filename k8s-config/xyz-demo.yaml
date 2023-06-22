@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: xyz-demo-app
-          image: jonknutson/xyz-demo:v1
+          image: jonknutson/xyz-demo:v2
           ports:
             - containerPort: 8080
               protocol: TCP
