@@ -16,7 +16,7 @@ type greeting struct {
 
 // getMOTD responds with the time and the message of the day.
 func getMOTD(c *gin.Context) {
-	message := "Automate all the things!"
+	message := "Happy Friday, y'all!"
 	currentTime := time.Now().Unix()
 	var motd = greeting{
 		Message: message, CurrentTime: currentTime,
