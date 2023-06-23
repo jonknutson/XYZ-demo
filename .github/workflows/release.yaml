@@ -2,25 +2,33 @@ name: Container Release
 
 on:
   workflow_dispatch:
+  release:
+    types:
+      - published
 
 jobs:
   release:
-    name: Tag Container Release
+    name: Build, Tag, and Push Container Release
     runs-on: ubuntu-22.04
-
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Login to Dockerhub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Fetch and tag image
+      - name: Build, tag, and push image to Docker Hub
         env:
           DOCKER_REGISTRY: jonknutson
           REPOSITORY: xyz-demo
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          docker pull $DOCKER_REGISTRY/$REPOSITORY:$GITHUB_SHA
+          docker build -t $DOCKER_REGISTRY/$REPOSITORY:$GITHUB_SHA .
           docker tag $DOCKER_REGISTRY/$REPOSITORY:$GITHUB_SHA $DOCKER_REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker tag $DOCKER_REGISTRY/$REPOSITORY:$GITHUB_SHA $DOCKER_REGISTRY/$REPOSITORY:latest
+          docker push $DOCKER_REGISTRY/$REPOSITORY:$GITHUB_SHA
           docker push $DOCKER_REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $DOCKER_REGISTRY/$REPOSITORY:latest
